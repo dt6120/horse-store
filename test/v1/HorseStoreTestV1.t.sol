@@ -6,9 +6,11 @@ import {BaseTestV1, HorseStore} from "./BaseTestV1.t.sol";
 contract HorseStoreTestV1 is BaseTestV1 {
     function testStoreAndReadHorseNumber(uint256 newNumberOfHorses) public {
         horseStoreSol.updateHorseNumber(newNumberOfHorses);
+        horseStoreYul.updateHorseNumber(newNumberOfHorses);
         horseStoreHuff.updateHorseNumber(newNumberOfHorses);
 
         assertEq(horseStoreSol.readNumberOfHorses(), newNumberOfHorses);
+        assertEq(horseStoreYul.readNumberOfHorses(), newNumberOfHorses);
         assertEq(horseStoreHuff.readNumberOfHorses(), newNumberOfHorses);
     }
 }
