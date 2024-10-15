@@ -1,0 +1,181 @@
+#include "./ERC721.huff"
+
+#define function mintHorse() nonpayable returns ()
+#define function feedHorse(uint256) nonpayable returns ()
+#define function isHappyHorse(uint256) view returns (bool)
+#define function horseIdToFedTimeStamp(uint256) view returns (uint256)
+#define function HORSE_HAPPY_IF_FED_WITHIN() view returns (uint256)
+
+#define constant TOTAL_SUPPLY_SLOT = FREE_STORAGE_POINTER()
+#define constant HORSE_FED_TIMESTAMP_SLOT = FREE_STORAGE_POINTER()
+#define constant HORSE_HAPPY_IF_FED_WITHIN_CONST = 0x0000000000000000000000000000000000000000000000000000000000015180
+
+#define macro CONSTRUCTOR() = takes (0) returns (0) {
+    ERC721_CONSTRUCTOR()
+}
+
+#define macro MAIN() = takes (0) returns (0) {
+    0x00 calldataload 0xe0 shr
+    dup1 __FUNC_SIG(mintHorse) eq mintHorse jumpi
+    dup1 __FUNC_SIG(feedHorse) eq feedHorse jumpi
+    dup1 __FUNC_SIG(isHappyHorse) eq isHappyHorse jumpi
+    dup1 __FUNC_SIG(horseIdToFedTimeStamp) eq horseIdToFedTimeStamp jumpi
+    dup1 __FUNC_SIG(HORSE_HAPPY_IF_FED_WITHIN) eq horseHappyFedWithin jumpi
+    
+    dup1 __FUNC_SIG(mint)                       eq mint_jump jumpi
+    dup1 __FUNC_SIG(burn)                       eq burn_jump jumpi
+
+    dup1 __FUNC_SIG("safeMint(address,uint256)") eq safe_mint jumpi
+    dup1 __FUNC_SIG("safeMint(address,uint256,bytes)") eq safe_mint_with_data jumpi
+
+    dup1 __FUNC_SIG("totalSupply()") eq total_supply jumpi
+
+    dup1 __FUNC_SIG(approve)                    eq approve jumpi
+    dup1 __FUNC_SIG(setApprovalForAll)          eq setApprovalForAll jumpi
+
+    dup1 __FUNC_SIG(transferFrom)               eq transferFrom jumpi
+    dup1 __FUNC_SIG(safeTransferFrom)           eq safeTransferFrom jumpi
+
+    dup1 __FUNC_SIG(name)                       eq name jumpi
+    dup1 __FUNC_SIG(symbol)                     eq symbol jumpi
+    dup1 __FUNC_SIG(tokenURI)                   eq tokenURI jumpi
+    dup1 __FUNC_SIG(supportsInterface)          eq supportsInterface jumpi
+
+    dup1 __FUNC_SIG(getApproved)                eq getApproved jumpi
+    dup1 __FUNC_SIG(isApprovedForAll)           eq isApprovedForAll jumpi
+
+    dup1 __FUNC_SIG(balanceOf)                  eq balanceOf jumpi
+    dup1 __FUNC_SIG(ownerOf)                    eq ownerOf jumpi
+
+    dup1 __FUNC_SIG("safeTransferFrom(address,address,uint256,bytes)") eq safeTransferFromData jumpi
+
+    // Revert on failed dispatch
+    0x00 dup1 revert
+
+    safe_mint:
+        SAFE_MINT()
+    safe_mint_with_data:
+        SAFE_MINT_WITH_DATA()
+
+    total_supply:
+        TOTAL_SUPPLY()
+
+    mint_jump:
+        MINT()
+    burn_jump:
+        BURN()
+
+    approve:
+        APPROVE()
+    setApprovalForAll:
+        SET_APPROVAL_FOR_ALL()
+
+    transferFrom:
+        TRANSFER_FROM()
+    safeTransferFrom:
+        SAFE_TRANSFER_FROM()
+    safeTransferFromData:
+        SAFE_TRANSFER_FROM_WITH_DATA()
+
+    name:
+        NAME()
+    symbol:
+        SYMBOL()
+    tokenURI:
+        TOKEN_URI()
+    supportsInterface:
+        SUPPORTS_INTERFACE()
+
+    getApproved:
+        GET_APPROVED()
+    isApprovedForAll:
+        IS_APPROVED_FOR_ALL()
+
+    balanceOf:
+        BALANCE_OF()
+    ownerOf:
+        OWNER_OF()
+
+    mintHorse:
+        MINT_HORSE()
+    feedHorse:
+        FEED_HORSE()
+    isHappyHorse:
+        IS_HAPPY_HORSE()
+    horseIdToFedTimeStamp:
+        GET_HORSE_FED_TIMESTAMP()
+    horseHappyFedWithin:
+        HORSE_FED_WITHIN_TIME()
+}
+
+#define macro TOTAL_SUPPLY() = takes (0) returns (0) {
+    [TOTAL_SUPPLY_SLOT] sload
+    0x00 mstore
+    0x20 0x00 return
+}
+
+#define macro MINT_HORSE() = takes (0) returns (0) {
+    [TOTAL_SUPPLY_SLOT] sload
+    dup1
+    caller
+
+    _MINT()
+
+    0x01 add [TOTAL_SUPPLY_SLOT] sstore
+    stop
+}
+
+#define macro FEED_HORSE() = takes (0) returns (0) {
+    timestamp
+    0x04 calldataload
+    [HORSE_FED_TIMESTAMP_SLOT]
+    GET_MAPPING_SLOT_FOR_KEY(0x00)
+    sstore
+    stop
+}
+
+#define macro IS_HAPPY_HORSE() = takes (0) returns (0) {
+    [HORSE_HAPPY_IF_FED_WITHIN_CONST]
+    timestamp
+    sub
+
+    0x004 calldataload
+    [HORSE_FED_TIMESTAMP_SLOT]
+    GET_VALUE_FROM_MAPPING_KEY(0x00)
+
+    dup2 dup2
+    
+    gt start_return_true jumpi
+    start_return jump
+
+    start_return_true:
+        0x01
+    start_return:
+        0x00 mstore
+        0x20 0x00 return
+}
+
+#define macro GET_HORSE_FED_TIMESTAMP() = takes (0) returns (0) {
+    0x004 calldataload
+    [HORSE_FED_TIMESTAMP_SLOT]
+    GET_VALUE_FROM_MAPPING_KEY(0x00)
+    0x00 mstore
+    0x20 0x00 return
+}
+
+#define macro HORSE_FED_WITHIN_TIME() = takes (0) returns (0) {
+    [HORSE_HAPPY_IF_FED_WITHIN_CONST]
+    0x00 mstore
+    0x20 0x00 return
+}
+
+#define macro GET_VALUE_FROM_MAPPING_KEY(mem_ptr) = takes (2) returns (1) {
+    GET_MAPPING_SLOT_FOR_KEY(<mem_ptr>)
+    sload
+}
+
+#define macro GET_MAPPING_SLOT_FOR_KEY(mem_ptr) = takes (2) returns (1) {
+    <mem_ptr> 0x20 add mstore
+    <mem_ptr> mstore
+    0x40 <mem_ptr> sha3
+}
