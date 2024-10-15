@@ -1,0 +1,132 @@
+[00]	PUSH1	24          // 0x24
+[02]	CALLDATALOAD	    // calldata_offset_0x24
+[03]	CALLER	            // msg.sender, calldata_offset_0x24
+[04]	PUSH0	            
+[05]	SLOAD	            // slot_0_val, msg.sender, calldata
+[06]	ADD	                //slot_o_val+msg.sender, calldata
+[07]	EQ	                // slot_0_val+msg.sender == calldata
+[08]	ISZERO	            // if not equal, revert
+[09]	PUSH2	00a4
+[0c]	JUMPI	
+
+[0d]	PUSH0	            // 0
+[0e]	CALLDATALOAD	    // calldata
+[0f]	PUSH1	e0          
+[11]	SHR	                // func_sel
+[12]	DUP1	            // func_sel, func_sel
+[13]	PUSH4	e18d4afd    // sel_2, func_sel
+[18]	EQ	                // sel_2 == func_sel
+[19]	PUSH2	003e
+[1c]	JUMPI	
+
+[1d]	DUP1	
+[1e]	PUSH4	90949f11    // sel_3
+[23]	EQ	
+[24]	PUSH2	0057
+[27]	JUMPI	
+
+[28]	DUP1	
+[29]	PUSH4	08949a76    // sel_1, func_sel, func_sel
+[2e]	EQ	
+[2f]	PUSH2	0071        // 0x71, sel_1 == func_sel, func_sel
+[32]	JUMPI	
+
+[33]	DUP1	
+[34]	PUSH4	7aa9a7f9
+[39]	EQ	
+[3a]	PUSH2	008b        // sel_4
+[3d]	JUMPI	
+
+[3e]	JUMPDEST	        // jumpi sel_2
+[3f]	PUSH0	        // 0x00
+[40]	SLOAD	        // slot_0_val
+[41]	PUSH0	        // 0x00, slot_0_val
+[42]	EQ	            // 0x00 == slot_0_val
+[43]	PUSH2	004a    // 0x4a
+
+[46]	JUMPI	
+[47]	PUSH0	
+[48]	PUSH0	
+[49]	REVERT	
+
+[4a]	JUMPDEST	    // slot_0_val == 0
+[4b]	PUSH1	01      // 0x01
+[4d]	PUSH0	        // 0x00
+[4e]	SSTORE	        // storage: 0x00 -> 0x01
+[4f]	PUSH1	07      // 0x07
+[51]	PUSH0	        // 0x00,0x07
+[52]	MSTORE	        // memory: 0x00 -> 0x07
+[53]	PUSH1	20
+[55]	PUSH0	
+[56]	RETURN	        // return 7
+
+[57]	JUMPDEST	    // sel_3
+[58]	PUSH0	        // 0x00
+[59]	SLOAD	        // slot_0_val
+[5a]	PUSH1	01      // 0x01
+[5c]	EQ	            // slot_0_val == 0x01
+[5d]	PUSH2	0064    // 0x64, slot_0_val == 0x01
+[60]	JUMPI	        // revert if slot_0_val != 0x01
+[61]	PUSH0	
+[62]	PUSH0	
+[63]	REVERT	
+
+[64]	JUMPDEST	    // sel_3, slot_0_val == 0x00
+[65]	PUSH1	02      // 0x02
+[67]	PUSH0	        // 0x00
+[68]	SSTORE	        // storage: 0x00 -> 0x02
+[69]	PUSH1	07      // 0x07
+[6b]	PUSH0	        // 0x00, 0x07
+[6c]	MSTORE	        // memory: 0x00 -> 0x07
+[6d]	PUSH1	20      // return 7
+[6f]	PUSH0	
+[70]	RETURN	
+
+[71]	JUMPDEST	// jumpi sel_1
+[72]	PUSH0	    // 0, func_sel
+[73]	SLOAD	    // slot_0_val, func_sel
+[74]	PUSH1	02  // 0x02, slot_0_val, func_sel
+[76]	EQ	        // slot_0_val == 0x02, func_sel
+[77]	PUSH2	007e// 0x7e, slot_0_val==0x02, func_sel
+[7a]	JUMPI	    // revert if slot0 val != 2
+[7b]	PUSH0	
+[7c]	PUSH0	
+[7d]	REVERT	
+
+[7e]	JUMPDEST	// jumpi sel_1 when slot0 val === 0x02
+[7f]	PUSH1	03  // 0x03, func_sel
+[81]	PUSH0	    // 0x00, 0x03, func_sel
+[82]	SSTORE	    // func_sel, storage: 0x00 -> 0x03
+[83]	PUSH1	07  // 0x07, func_sel
+[85]	PUSH0	    // 0x00, 0x07, func_sel
+[86]	MSTORE	    // func_sel, memory: 0x00 -> 0x07
+[87]	PUSH1	20  // 0x20
+[89]	PUSH0	    // 0x00, 0x20
+[8a]	RETURN	    // return 32 bytes from 0 offset from memory
+
+[8b]	JUMPDEST	// sel_4
+[8c]	PUSH0	    // 0x00
+[8d]	SLOAD	    // slot_0_val
+[8e]	PUSH1	03  // 0x03, slot_0_val
+[90]	EQ	        // 0x03 == slot_0_val
+[91]	PUSH2	0098
+[94]	JUMPI	    // revert if slot_0_val != 3
+[95]	PUSH0	
+[96]	PUSH0	
+[97]	REVERT	
+
+[98]	JUMPDEST	// slot_0_val == 3
+[99]	PUSH0	    // 0x00
+[9a]	PUSH0	    // 0x00
+[9b]	SSTORE	    // storage: 0x00 -> 0x00
+[9c]	PUSH1	07  // return 7
+[9e]	PUSH0	
+[9f]	MSTORE	
+[a0]	PUSH1	20
+[a2]	PUSH0	
+[a3]	RETURN
+
+[a4]	JUMPDEST	
+[a5]	PUSH0	
+[a6]	PUSH0	
+[a7]	REVERT
